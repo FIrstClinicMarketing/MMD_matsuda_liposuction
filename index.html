@@ -116,12 +116,12 @@
                         <span class="tracking-widest font-medium text-sm">24時間 WEB予約</span>
                     </a>
 
-                    <a href="https://line.me/R/ti/p/@646gomgz?ts=02010033&oat_content=url" data-forward-query target="_blank" rel="noopener noreferrer" class="block w-full btn-line py-4 rounded-sm shadow-md btn-hover flex items-center justify-center">
+                    <a href="https://line.me/R/ti/p/@646gomgz?ts=02010033&oat_content=url" target="_blank" rel="noopener noreferrer" class="block w-full btn-line py-4 rounded-sm shadow-md btn-hover flex items-center justify-center">
                         <i class="fa-brands fa-line mr-3 text-2xl"></i>
                         <span class="font-bold tracking-wide text-sm">公式LINEで相談する</span>
                     </a>
 
-                    <a href="https://firstclinic-tokyo.com/?utm_content=IGPF_HP_matsuda" data-forward-query target="_blank" rel="noopener noreferrer" class="block w-full bg-white text-primary border border-gray-300 py-4 rounded-sm shadow-sm btn-hover flex items-center justify-center">
+                    <a href="https://firstclinic-tokyo.com/?utm_content=IGPF_HP_matsuda_lipo" data-forward-query target="_blank" rel="noopener noreferrer" class="block w-full bg-white text-primary border border-gray-300 py-4 rounded-sm shadow-sm btn-hover flex items-center justify-center">
                         <i class="fa-solid fa-globe mr-3 text-gray-400"></i>
                         <span class="tracking-widest text-xs">クリニック公式HP</span>
                     </a>
@@ -382,7 +382,7 @@
                     お客様にとっての「First（最優先）」な<br>クリニックでありたい。<br>
                     一人ひとりのご希望に、丁寧に向き合います。
                 </p>
-                <a href="https://firstclinic-tokyo.com/?utm_content=IGPF_HP_matsuda" data-forward-query target="_blank" rel="noopener noreferrer" class="block w-full text-primary border border-primary px-6 py-3 text-xs tracking-widest hover:bg-primary hover:text-white transition duration-500">
+                <a href="https://firstclinic-tokyo.com/?utm_content=IGPF_HP_matsuda_lipo" data-forward-query target="_blank" rel="noopener noreferrer" class="block w-full text-primary border border-primary px-6 py-3 text-xs tracking-widest hover:bg-primary hover:text-white transition duration-500">
                     CLINIC OFFICIAL SITE
                 </a>
             </section>
@@ -408,10 +408,16 @@
             document.querySelectorAll('a[data-forward-query]').forEach(link => {
                 const destination = new URL(link.href);
                 for (const key of new Set(incomingQuery.keys())) {
-                    // Keep destination-specific routing parameters; incoming campaign tags take precedence.
+                    // Preserve routing parameters while carrying campaign attribution to tracked destinations.
                     if (destination.searchParams.has(key) && !key.startsWith('utm_')) continue;
                     destination.searchParams.delete(key);
                     incomingQuery.getAll(key).forEach(value => destination.searchParams.append(key, value));
+                }
+                if (destination.hostname === 'firstclinic-tokyo.com') {
+                    const content = destination.searchParams.get('utm_content');
+                    if (content && /^(IGPF|IGST|IGAD|iSTP)_RSV_/.test(content)) {
+                        destination.searchParams.set('utm_content', content.replace('_RSV_', '_HP_'));
+                    }
                 }
                 link.href = destination.href;
             });
